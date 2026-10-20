@@ -25,6 +25,8 @@ jobs:
             CODE_SIGN_IDENTITY="" \
             CODE_SIGNING_REQUIRED=NO \
             CODE_SIGNING_ALLOWED=NO \
+            MARKETING_VERSION="4.3.0" \
+            CURRENT_PROJECT_VERSION="106" \
             build
 
       - name: Package
