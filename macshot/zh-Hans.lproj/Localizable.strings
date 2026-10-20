@@ -547,6 +547,11 @@
 "Resume" = "继续";
 "Engine:" = "引擎:";
 "Google Translate" = "Google Translate";
+"阿里云翻译" = "阿里云翻译";
+"阿里云 AccessKey ID:" = "阿里云 AccessKey ID:";
+"阿里云 AccessKey Secret:" = "阿里云 AccessKey Secret:";
+"阿里云 AccessKey Secret" = "阿里云 AccessKey Secret";
+"阿里云使用通用版翻译 API，每月免费额度 100 万字符。" = "阿里云使用通用版翻译 API，每月免费额度 100 万字符。";
 "Apple (on-device)" = "Apple（设备端）";
 "Apple translation is faster and works offline. Google Translate supports more languages." = "Apple 翻译更快且支持离线使用。Google Translate 支持更多语言。";
 "Download language packs in System Settings…" = "在系统设置中下载语言包…";
