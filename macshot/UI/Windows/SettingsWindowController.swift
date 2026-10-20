@@ -112,6 +112,8 @@ class SettingsWindowController: NSWindowController, NSToolbarDelegate, NSWindowD
     private var downscaleRetinaCheckbox: NSButton!
     private var captureMenuOrder: [CaptureMenuItemID] = []
     private var captureMenuOrderRowsStack: NSStackView?
+    private var aliyunAKField: NSTextField!
+    private var aliyunSecretField: NSSecureTextField!
     // embedColorProfileCheckbox removed — native color profile is always embedded
     private var localMonitor: Any?
     #if !OFFLINE
@@ -1058,8 +1060,15 @@ class SettingsWindowController: NSWindowController, NSToolbarDelegate, NSWindowD
             translationProviderPopup.addItems(withTitles: [
                 L("Apple (on-device)"),
                 L("Google Translate"),
+                L("Aliyun Translate"),
             ])
-            translationProviderPopup.selectItem(at: TranslationService.provider == .apple ? 0 : 1)
+            let selectedProviderIndex: Int
+            switch TranslationService.provider {
+            case .apple: selectedProviderIndex = 0
+            case .google: selectedProviderIndex = 1
+            case .aliyun: selectedProviderIndex = 2
+            }
+            translationProviderPopup.selectItem(at: selectedProviderIndex)
             translationProviderPopup.target = self
             translationProviderPopup.action = #selector(translationProviderChanged(_:))
             stack.addArrangedSubview(labeledRow(L("Engine:"), controls: [translationProviderPopup]))
@@ -1077,6 +1086,26 @@ class SettingsWindowController: NSWindowController, NSToolbarDelegate, NSWindowD
             downloadLink.contentTintColor = .linkColor
             downloadLink.font = NSFont.systemFont(ofSize: 10)
             stack.addArrangedSubview(indented(downloadLink))
+            stack.setCustomSpacing(4, after: stack.arrangedSubviews.last!)
+
+            aliyunAKField = NSTextField(string: TranslationService.aliyunAccessKeyId)
+            aliyunAKField.placeholderString = "LTAI…"
+            aliyunAKField.font = NSFont.monospacedSystemFont(ofSize: 11, weight: .regular)
+            aliyunAKField.delegate = self
+            aliyunAKField.widthAnchor.constraint(greaterThanOrEqualToConstant: 220).isActive = true
+            stack.addArrangedSubview(labeledRow(L("Aliyun AccessKey ID:"), controls: [aliyunAKField]))
+
+            aliyunSecretField = NSSecureTextField(string: TranslationService.aliyunAccessKeySecret)
+            aliyunSecretField.placeholderString = L("Aliyun AccessKey Secret")
+            aliyunSecretField.font = NSFont.monospacedSystemFont(ofSize: 11, weight: .regular)
+            aliyunSecretField.delegate = self
+            aliyunSecretField.widthAnchor.constraint(greaterThanOrEqualToConstant: 220).isActive = true
+            stack.addArrangedSubview(labeledRow(L("Aliyun AccessKey Secret:"), controls: [aliyunSecretField]))
+
+            let aliyunNote = NSTextField(wrappingLabelWithString: L("Aliyun uses the General Translation API. The free quota is 1,000,000 characters per month."))
+            aliyunNote.font = NSFont.systemFont(ofSize: 10)
+            aliyunNote.textColor = .secondaryLabelColor
+            stack.addArrangedSubview(indented(aliyunNote))
             stack.setCustomSpacing(20, after: stack.arrangedSubviews.last!)
         }
 
@@ -3398,7 +3427,11 @@ class SettingsWindowController: NSWindowController, NSToolbarDelegate, NSWindowD
     }
 
     @objc private func translationProviderChanged(_ sender: NSPopUpButton) {
-        TranslationService.provider = sender.indexOfSelectedItem == 0 ? .apple : .google
+        switch sender.indexOfSelectedItem {
+        case 0: TranslationService.provider = .apple
+        case 2: TranslationService.provider = .aliyun
+        default: TranslationService.provider = .google
+        }
     }
 
     @objc private func openTranslationSettings() {
@@ -3455,6 +3488,10 @@ extension SettingsWindowController: NSTextFieldDelegate {
             field.stringValue = FilenameFormatter.defaultRecordingTemplate
             UserDefaults.standard.set(FilenameFormatter.defaultRecordingTemplate, forKey: FilenameFormatter.recordingUserDefaultsKey)
             updateRecordingFilenamePreview()
+        } else if field === aliyunAKField {
+            TranslationService.aliyunAccessKeyId = trimmed
+        } else if field === aliyunSecretField {
+            TranslationService.aliyunAccessKeySecret = trimmed
         }
     }
 }
