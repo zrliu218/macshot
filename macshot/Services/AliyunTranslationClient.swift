@@ -230,13 +230,17 @@ enum AliyunTranslationClient {
     // MARK: - Language and chunking
 
     private static func aliyunLanguageCode(_ code: String) -> String {
-        switch code {
-        case "zh-CN": return "zh"
-        case "zh-TW": return "zh-tw"
-        case "nb": return "no"
-        case "fil": return "tl"
-        default: return code.lowercased()
+        let lower = code.lowercased()
+        // Aliyun uses "zh" / "zh-tw", not BCP-47 script tags like "zh-Hans".
+        if lower.hasPrefix("zh-hant") || lower == "zh-tw" || lower == "zh-hk" || lower == "zh-mo" {
+            return "zh-tw"
         }
+        if lower.hasPrefix("zh") { return "zh" }
+        if lower.hasPrefix("pt") { return "pt" }
+        if lower.hasPrefix("nb") || lower.hasPrefix("no") { return "no" }
+        if lower.hasPrefix("fil") || lower.hasPrefix("tl") { return "tl" }
+        // Aliyun expects base language codes for the rest (en-US -> en, fr-CA -> fr).
+        return lower.split(separator: "-").first.map(String.init) ?? lower
     }
 
     private static func split(_ text: String, limit: Int) -> [String] {
