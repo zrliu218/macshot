@@ -7,6 +7,7 @@ import SwiftUI
 enum TranslationProvider: String {
     case apple = "apple"
     case google = "google"
+    case aliyun = "aliyun"
 }
 
 enum TranslationService {
@@ -20,6 +21,18 @@ enum TranslationService {
             return .google  // Google by default — Apple requires language pack downloads
         }
         set { UserDefaults.standard.set(newValue.rawValue, forKey: "translationProvider") }
+    }
+
+    // MARK: - Aliyun credentials
+
+    static var aliyunAccessKeyId: String {
+        get { UserDefaults.standard.string(forKey: "aliyunAccessKeyId") ?? "" }
+        set { UserDefaults.standard.set(newValue, forKey: "aliyunAccessKeyId") }
+    }
+
+    static var aliyunAccessKeySecret: String {
+        get { UserDefaults.standard.string(forKey: "aliyunAccessKeySecret") ?? "" }
+        set { UserDefaults.standard.set(newValue, forKey: "aliyunAccessKeySecret") }
     }
 
     /// Whether Apple Translation is available on this system.
@@ -153,6 +166,16 @@ enum TranslationService {
 
         if #available(macOS 15.0, *), provider == .apple {
             translateBatchApple(texts: texts, targetLang: targetLang, completion: completion)
+        } else if provider == .aliyun {
+            AliyunTranslationClient.translate(
+                texts: texts,
+                targetLang: targetLang,
+                config: AliyunTranslationClient.Config(
+                    accessKeyId: aliyunAccessKeyId,
+                    accessKeySecret: aliyunAccessKeySecret
+                ),
+                completion: completion
+            )
         } else {
             translateBatchGoogle(texts: texts, targetLang: targetLang, completion: completion)
         }
