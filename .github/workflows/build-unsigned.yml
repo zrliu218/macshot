@@ -1,0 +1,36 @@
+name: Build unsigned
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: macos-26
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Show Xcode version
+        run: xcodebuild -version
+
+      - name: Build
+        run: |
+          xcodebuild \
+            -project macshot.xcodeproj \
+            -scheme macshot \
+            -configuration Release \
+            -derivedDataPath build \
+            CODE_SIGN_IDENTITY="" \
+            CODE_SIGNING_REQUIRED=NO \
+            CODE_SIGNING_ALLOWED=NO \
+            build
+
+      - name: Package
+        run: ditto -c -k --sequesterRsrc --keepParent "build/Build/Products/Release/macshot.app" macshot-unsigned.zip
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: macshot-unsigned
+          path: macshot-unsigned.zip
