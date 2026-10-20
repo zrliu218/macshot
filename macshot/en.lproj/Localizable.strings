@@ -546,6 +546,11 @@
 "Resume" = "Resume";
 "Engine:" = "Engine:";
 "Google Translate" = "Google Translate";
+"Aliyun Translate" = "Aliyun Translate";
+"Aliyun AccessKey ID:" = "Aliyun AccessKey ID:";
+"Aliyun AccessKey Secret:" = "Aliyun AccessKey Secret:";
+"Aliyun AccessKey Secret" = "Aliyun AccessKey Secret";
+"Aliyun uses the General Translation API. The free quota is 1,000,000 characters per month." = "Aliyun uses the General Translation API. The free quota is 1,000,000 characters per month.";
 "Apple (on-device)" = "Apple (on-device)";
 "Apple translation is faster and works offline. Google Translate supports more languages." = "Apple translation is faster and works offline. Google Translate supports more languages.";
 "Download language packs in System Settings…" = "Download language packs in System Settings…";
