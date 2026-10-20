@@ -143,13 +143,13 @@ enum AliyunTranslationClient {
         let signature = sign(stringToSign, secret: config.accessKeySecret)
         params["Signature"] = signature
 
-        var bodyComponents: [URLQueryItem] = []
-        for key in params.keys.sorted() {
-            bodyComponents.append(URLQueryItem(name: key, value: params[key]))
-        }
-        var body = URLComponents()
-        body.queryItems = bodyComponents
-        let bodyString = body.percentEncodedQuery ?? ""
+        // Build the body with the same RFC 3986 encoding used for the
+        // signature. URLComponents leaves some characters (+, !, *, ', (, ))
+        // unescaped, which makes the server compute a different string to
+        // sign and reject the request with SignatureDoesNotMatch.
+        let bodyString = params.keys.sorted().map { key in
+            "\(percentEncode(key))=\(percentEncode(params[key] ?? ""))"
+        }.joined(separator: "&")
 
         var request = URLRequest(url: URL(string: endpoint)!)
         request.httpMethod = "POST"
